@@ -7,7 +7,7 @@
 #include "ofxNetwork.h"
 #include "ofxJSONElement.h"
 #include "mutLight.h"
-//#include "ofxMidi.h"
+#include "ofxMidi.h"
 
 class ofApp : public ofBaseApp{
     
@@ -111,7 +111,7 @@ public:
     ofVec3f lightOrientationWest;
     
     
-//    ofxMidiOut midiOut;
+    ofxMidiOut midiOut;
     //	int channel;
     
     unsigned int currentPgm;
@@ -135,6 +135,7 @@ public:
     ofxOscSender *sender8;
     ofxOscSender *sender9;
     ofxOscSender *senderToAudio;
+    ofxOscSender *senderToLammp;
     
     ofxTCPClient tcpClient;
     int deltaTime = 0;

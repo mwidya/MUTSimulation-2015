@@ -113,6 +113,25 @@ void ofApp::sendLightPositions(){
             m.addFloatArg(l->getOrientationEuler().z);
             senders[j]->sendMessage(m);
         }
+        
+        if (i==0) {
+            ofxOscMessage msgLammp;
+            msgLammp.setAddress("/LAMMPS");
+            msgLammp.addIntArg(i);
+            msgLammp.addIntArg(l->getDiffuseColor().r*255);
+            msgLammp.addIntArg(l->getDiffuseColor().g*255);
+            msgLammp.addIntArg(l->getDiffuseColor().b*255);
+            msgLammp.addIntArg(l->getDiffuseColor().r*255);
+            msgLammp.addIntArg(l->getDiffuseColor().g*255);
+            msgLammp.addIntArg(l->getDiffuseColor().b*255);
+            msgLammp.addIntArg(l->getDiffuseColor().r*255);
+            msgLammp.addIntArg(l->getDiffuseColor().g*255);
+            msgLammp.addIntArg(l->getDiffuseColor().b*255);
+            msgLammp.addIntArg(l->getDiffuseColor().r*255);
+            msgLammp.addIntArg(l->getDiffuseColor().g*255);
+            msgLammp.addIntArg(l->getDiffuseColor().b*255);
+            senderToLammp->sendMessage(msgLammp);
+        }
     }
 }
 
@@ -295,7 +314,7 @@ void ofApp::allNotesOff(){
 
 void ofApp::playNote(int note, int velocity, int channel){
     
-//    midiOut.sendNoteOn(channel, note,  velocity);
+    midiOut.sendNoteOn(channel, note,  velocity);
     
 }
 
@@ -382,6 +401,7 @@ void ofApp::setupOSC(){
     sender8 = new ofxOscSender();
     sender9 = new ofxOscSender();
     senderToAudio = new ofxOscSender();
+    senderToLammp = new ofxOscSender();
     
     bool local = true;
     
@@ -398,8 +418,20 @@ void ofApp::setupOSC(){
         sender8->setup(VIDEO_OSC_IP, 6008);
         sender9->setup(VIDEO_OSC_IP, 6009);
         senderToAudio->setup(AUDIO_OSC_IP, 6010);
+        senderToLammp->setup("localhost", 7000);
     }
     else{
+//        sender0->setup("10.0.0.12", 6000);
+//        sender1->setup("10.0.0.10", 6001);
+//        sender2->setup("10.0.0.14", 6002);
+//        sender3->setup("10.0.0.12", 6003);
+//        sender4->setup("10.0.0.11", 6004);
+//        sender5->setup("10.0.0.13", 6005);
+//        sender6->setup("10.0.0.12", 6006);
+//        sender7->setup("10.0.0.14", 6007);
+//        sender8->setup("10.0.0.15", 6008);
+//        sender9->setup("10.0.0.14", 6009);
+//        senderToAudio->setup("10.0.0.7", 6010);
         sender0->setup("10.0.0.12", 6000);
         sender1->setup("10.0.0.10", 6001);
         sender2->setup("10.0.0.14", 6002);
@@ -407,10 +439,11 @@ void ofApp::setupOSC(){
         sender4->setup("10.0.0.11", 6004);
         sender5->setup("10.0.0.13", 6005);
         sender6->setup("10.0.0.12", 6006);
-        sender7->setup("10.0.0.14", 6007);
-        sender8->setup("10.0.0.15", 6008);
-        sender9->setup("10.0.0.14", 6009);
+        sender7->setup("10.0.0.15", 6007);
+        sender8->setup("10.0.0.16", 6008);
+        sender9->setup("10.0.0.15", 6009);
         senderToAudio->setup("10.0.0.7", 6010);
+        senderToLammp->setup("10.0.0.21", 7000);
     }
     
     senders.push_back(sender0);
@@ -525,23 +558,23 @@ void ofApp::setupSyphon(){
 
 void ofApp::setupMIDI(){
     
-//    // print the available output ports to the console
-//    midiOut.listPorts(); // via instance
-//    //ofxMidiOut::listPorts(); // via static too
-//    
-//    // connect
-//    midiOut.openPort(MIDI_DEVICE_NAME); // by number
-//    //midiOut.openPort("IAC Driver Pure Data In"); // by name
-//    //midiOut.openVirtualPort("ofxMidiOut"); // open a virtual port
-//    
-//    //	channel = 1;
-//    currentPgm = 0;
-//    note = 0;
-//    velocity = 0;
-//    pan = 0;
-//    bend = 0;
-//    touch = 0;
-//    polytouch = 0;
+    // print the available output ports to the console
+    midiOut.listPorts(); // via instance
+    //ofxMidiOut::listPorts(); // via static too
+    
+    // connect
+    midiOut.openPort(MIDI_DEVICE_NAME); // by number
+    //midiOut.openPort("IAC Driver Pure Data In"); // by name
+    //midiOut.openVirtualPort("ofxMidiOut"); // open a virtual port
+    
+    //	channel = 1;
+    currentPgm = 0;
+    note = 0;
+    velocity = 0;
+    pan = 0;
+    bend = 0;
+    touch = 0;
+    polytouch = 0;
     
 }
 

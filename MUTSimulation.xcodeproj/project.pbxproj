@@ -26,6 +26,7 @@
 		E7E077E515D3B63C0020DFD4 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */; };
 		E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E715D3B6510020DFD4 /* QTKit.framework */; };
 		E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7F985F515E0DE99003869B5 /* Accelerate.framework */; };
+		EE54C0731BCDAB4C00AADD24 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE54C0721BCDAB4C00AADD24 /* CoreMIDI.framework */; };
 		EE63EBC71BBE994C009D97B9 /* jsoncpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EE63EAEC1BBE994B009D97B9 /* jsoncpp.cpp */; };
 		EE63EBC91BBE994C009D97B9 /* ofxJSONElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EE63EAF01BBE994B009D97B9 /* ofxJSONElement.cpp */; };
 		EE63EBE21BBE994C009D97B9 /* ofxTCPClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EE63EB591BBE994C009D97B9 /* ofxTCPClient.cpp */; };
@@ -119,6 +120,7 @@
 		E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
 		E7E077E715D3B6510020DFD4 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		E7F985F515E0DE99003869B5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = /System/Library/Frameworks/Accelerate.framework; sourceTree = "<absolute>"; };
+		EE54C0721BCDAB4C00AADD24 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		EE63EAE91BBE994B009D97B9 /* json-forwards.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "json-forwards.h"; sourceTree = "<group>"; };
 		EE63EAEA1BBE994B009D97B9 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
 		EE63EAEC1BBE994B009D97B9 /* jsoncpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsoncpp.cpp; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE54C0731BCDAB4C00AADD24 /* CoreMIDI.framework in Frameworks */,
 				E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */,
 				E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */,
 				EEF09B901BC3113B00932DAB /* Syphon.framework in Frameworks */,
@@ -293,6 +296,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				EE54C0721BCDAB4C00AADD24 /* CoreMIDI.framework */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
@@ -523,8 +527,8 @@
 		EE63ECB21BBE9E57009D97B9 /* ofxMidi */ = {
 			isa = PBXGroup;
 			children = (
-				EE63ECF51BBE9E57009D97B9 /* libs */,
 				EE63ED0E1BBE9E57009D97B9 /* src */,
+				EE63ECF51BBE9E57009D97B9 /* libs */,
 			);
 			name = ofxMidi;
 			path = ../../../addons/ofxMidi;
@@ -872,8 +876,14 @@
 					"../../../addons/ofxJSON/**",
 					"../../../addons/ofxNetwork/**",
 					"../../../addons/ofxOSC/**",
-					"../../../addons/ofxMidi/**",
 					"../../../addons/ofxSyphon/**",
+					../../../addons/ofxMidi/libs,
+					../../../addons/ofxMidi/libs/portmidi,
+					../../../addons/ofxMidi/libs/pgmidi,
+					../../../addons/ofxMidi/src/ios,
+					../../../addons/ofxMidi/src/desktop,
+					../../../addons/ofxMidi/src,
+					../../../addons/ofxMidi/libs/rtmidi,
 				);
 				ICON = "$(ICON_NAME_DEBUG)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
@@ -968,8 +978,14 @@
 					"../../../addons/ofxJSON/**",
 					"../../../addons/ofxNetwork/**",
 					"../../../addons/ofxOSC/**",
-					"../../../addons/ofxMidi/**",
 					"../../../addons/ofxSyphon/**",
+					../../../addons/ofxMidi/libs,
+					../../../addons/ofxMidi/libs/portmidi,
+					../../../addons/ofxMidi/libs/pgmidi,
+					../../../addons/ofxMidi/src/ios,
+					../../../addons/ofxMidi/src/desktop,
+					../../../addons/ofxMidi/src,
+					../../../addons/ofxMidi/libs/rtmidi,
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
