@@ -7,8 +7,7 @@
 #define PORT 12333
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 
-
-#define MAX_LIGHTS 4
+#define MAX_LIGHTS 1
 
 float factor = 0.2f;
 // 1.0 = 1 meter
@@ -112,25 +111,6 @@ void ofApp::sendLightPositions(){
             m.addFloatArg(l->getOrientationEuler().y);
             m.addFloatArg(l->getOrientationEuler().z);
             senders[j]->sendMessage(m);
-        }
-        
-        if (i==0) {
-            ofxOscMessage msgLammp;
-            msgLammp.setAddress("/LAMMPS");
-            msgLammp.addIntArg(i);
-            msgLammp.addIntArg(l->getDiffuseColor().r*255);
-            msgLammp.addIntArg(l->getDiffuseColor().g*255);
-            msgLammp.addIntArg(l->getDiffuseColor().b*255);
-            msgLammp.addIntArg(l->getDiffuseColor().r*255);
-            msgLammp.addIntArg(l->getDiffuseColor().g*255);
-            msgLammp.addIntArg(l->getDiffuseColor().b*255);
-            msgLammp.addIntArg(l->getDiffuseColor().r*255);
-            msgLammp.addIntArg(l->getDiffuseColor().g*255);
-            msgLammp.addIntArg(l->getDiffuseColor().b*255);
-            msgLammp.addIntArg(l->getDiffuseColor().r*255);
-            msgLammp.addIntArg(l->getDiffuseColor().g*255);
-            msgLammp.addIntArg(l->getDiffuseColor().b*255);
-            senderToLammp->sendMessage(msgLammp);
         }
     }
 }
@@ -620,7 +600,8 @@ void ofApp::setup(){
     
     sendPlanePositions();
     
-    drawMarker(markerOn);
+//    drawMarker(markerOn);
+    drawMarker(false);
     
     easyCam.setDistance(30000*factor);
     
@@ -632,10 +613,10 @@ void ofApp::setup(){
 
 void ofApp::reset(){
     
-    setLightPositionAndMovementForMarkerId(lights[0], markerIds[0], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[0], markerIds[4], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
 }
 
 void ofApp::setLightPositionAndMovementForMarkerId(mutLight *l, int markerId, ofVec2f touchPoint, int lightMovement){
@@ -897,45 +878,71 @@ void ofApp::update(){
                      setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y , ofGetElapsedTimef()*20));*/
                     
                     if (l->getMutLightId() == 0) {
-                        setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y + 1 , l->getOrientationEuler().z));
+                        
+                        float sine = cos(ofGetElapsedTimef()) * 0.5;
+//                        cout << "sine = " << sine << endl;
+                        setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y, l->getOrientationEuler().z - sine));
                         
                         ofVec3f vec;
                         
                         vec.x = l->getStartPosition().x;
                         vec.y = l->getStartPosition().y;
-                        vec.z = l->getStartPosition().z + sin(ofGetElapsedTimef()) * 250;
-                        l->setPosition(vec.x, vec.y, vec.z);
-                    }
-                    else if (l->getMutLightId() == 1) {
-                        
-                        ofVec3f vec;
-                        
-                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
-                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
                         vec.z = l->getStartPosition().z;
-                        
-                        l->lookAt(l->getStartPosition());
-                        l->setPosition(vec);
-                    }
-                    else if (l->getMutLightId() == 2) {
-                        
-                        ofVec3f vec;
-                        
-                        vec.x = l->getStartPosition().x + sin(ofGetElapsedTimef() * 0.1f) * 5000 + 1000;
-                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef() * 1) * 500;
-                        vec.z = l->getStartPosition().z + sin(ofGetElapsedTimef() * 0.5f) * 500;
                         l->setPosition(vec.x, vec.y, vec.z);
+                        
+                        int factor = 255 * sine + 127;
+                        cout << "factor = " << factor << endl;
+                        if (i==0) {
+                            ofxOscMessage msgLammp;
+                            msgLammp.setAddress("/LAMMPS");
+                            msgLammp.addIntArg(i);
+                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
+                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
+                            senderToLammp->sendMessage(msgLammp);
+                        }
                     }
                     
-                    else if (l->getMutLightId() == 3) {
-                        
-                        ofVec3f vec;
-                        
-                        vec.x = l->getStartOrientation().x;
-                        vec.y = l->getStartOrientation().y + ofGetElapsedTimef()*10;
-                        vec.z = l->getStartOrientation().z;
-                        setLightOri(l, vec);
-                    }
+                    
+//                    else if (l->getMutLightId() == 1) {
+//                        
+//                        ofVec3f vec;
+//                        
+//                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
+//                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
+//                        vec.z = l->getStartPosition().z;
+//                        
+//                        l->lookAt(l->getStartPosition());
+//                        l->setPosition(vec);
+//                    }
+//                    else if (l->getMutLightId() == 2) {
+//                        
+//                        ofVec3f vec;
+//                        
+//                        vec.x = l->getStartPosition().x + sin(ofGetElapsedTimef() * 0.1f) * 5000 + 1000;
+//                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef() * 1) * 500;
+//                        vec.z = l->getStartPosition().z + sin(ofGetElapsedTimef() * 0.5f) * 500;
+//                        l->setPosition(vec.x, vec.y, vec.z);
+//                    }
+//                    
+//                    else if (l->getMutLightId() == 3) {
+//                        
+//                        ofVec3f vec;
+//                        
+//                        vec.x = l->getStartOrientation().x;
+//                        vec.y = l->getStartOrientation().y + ofGetElapsedTimef()*10;
+//                        vec.z = l->getStartOrientation().z;
+//                        setLightOri(l, vec);
+//                    }
                     
                 }
             }
@@ -1020,6 +1027,15 @@ void ofApp::draw(){
     easyCam.end();
     
     ofDisableDepthTest();
+    
+    if (tcpClient.isConnected())
+    {
+        ofDrawBitmapString("TCP is connected to IP " + ofToString(SERVER_TCP_IP) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
+    }
+    else
+    {
+        ofDrawBitmapString("TCP is NOT connected to IP " + ofToString(SERVER_TCP_IP) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
+    }
 }
 
 void ofApp::keyPressed(int key){
