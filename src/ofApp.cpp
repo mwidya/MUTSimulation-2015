@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
 
-#define SERVER_TCP_IP "localhost"
+//#define SERVER_TCP_IP "localhost"
 #define VIDEO_OSC_IP "localhost"
 #define AUDIO_OSC_IP "localhost"
 #define PORT 12333
@@ -381,11 +381,12 @@ void ofApp::setupOSC(){
     sender8 = new ofxOscSender();
     sender9 = new ofxOscSender();
     senderToAudio = new ofxOscSender();
-    senderToLammp = new ofxOscSender();
+    senderToLammp0 = new ofxOscSender();
+    senderToLammp1 = new ofxOscSender();
+    senderToLammp2 = new ofxOscSender();
+    senderToLammp3 = new ofxOscSender();
     
-    bool local = true;
-    
-    if (local) {
+    if (networkIsLocal) {
         
         sender0->setup(VIDEO_OSC_IP, 6000);
         sender1->setup(VIDEO_OSC_IP, 6001);
@@ -398,7 +399,10 @@ void ofApp::setupOSC(){
         sender8->setup(VIDEO_OSC_IP, 6008);
         sender9->setup(VIDEO_OSC_IP, 6009);
         senderToAudio->setup(AUDIO_OSC_IP, 6010);
-        senderToLammp->setup("localhost", 7000);
+        senderToLammp0->setup("localhost", 7000);
+        senderToLammp1->setup("localhost", 7000);
+        senderToLammp2->setup("localhost", 7000);
+        senderToLammp3->setup("localhost", 7000);
     }
     else{
 //        sender0->setup("10.0.0.12", 6000);
@@ -423,7 +427,10 @@ void ofApp::setupOSC(){
         sender8->setup("10.0.0.16", 6008);
         sender9->setup("10.0.0.15", 6009);
         senderToAudio->setup("10.0.0.7", 6010);
-        senderToLammp->setup("10.0.0.21", 7000);
+        senderToLammp0->setup("10.0.0.21", 7000);
+        senderToLammp1->setup("10.0.0.21", 7000);
+        senderToLammp2->setup("10.0.0.21", 7000);
+        senderToLammp3->setup("10.0.0.21", 7000);
     }
     
     senders.push_back(sender0);
@@ -559,7 +566,13 @@ void ofApp::setupMIDI(){
 }
 
 void ofApp::setupTCP(){
-    tcpClient.setup(SERVER_TCP_IP, PORT);
+    if (networkIsLocal) {
+        tcpServerIp = "localhost";
+    }else
+    {
+        tcpServerIp = "10.0.0.5";
+    }
+    tcpClient.setup(tcpServerIp, PORT);
     tcpClient.setMessageDelimiter("\n");
 }
 
@@ -585,6 +598,8 @@ void ofApp::setupLights(){
 }
 
 void ofApp::setup(){
+    
+    networkIsLocal = true;
     
     setupOSC();
     
@@ -786,6 +801,51 @@ void ofApp::lightCreate(mutLight *l){
 
 void ofApp::update(){
     
+//    int r0 = 222;
+//    int g0 = 134;
+//    int b0 = 122;
+//    int rgbs0[] = {r0, g0, b0, r0, g0, b0, r0, g0, b0, r0, g0, b0};
+//    setLammpWithRGBs(0, rgbs0, 12);
+//    ofxOscMessage msgLammp0;
+//    msgLammp0.setAddress("/LAMMPS");
+//    msgLammp0.addIntArg(0);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    msgLammp0.addIntArg(123);
+//    senderToLammp0->sendMessage(msgLammp0);
+    
+//    int r1 = 23;
+//    int g1 = 55;
+//    int b1 = 233;
+//    int rgbs1[] = {r1, g1, b1, r1, g1, b1, r1, g1, b1, r1, g1, b1};
+//    setLammpWithRGBs(1, rgbs1, 12);
+//    ofxOscMessage msgLammp1;
+//    msgLammp1.setAddress("/LAMMPS");
+//    msgLammp1.addIntArg(1);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    msgLammp1.addIntArg(34);
+//    senderToLammp1->sendMessage(msgLammp1);
+
+    
     if (tcpClient.isConnected())
     {
         string str = tcpClient.receive();
@@ -825,7 +885,7 @@ void ofApp::update(){
         deltaTime = ofGetElapsedTimeMillis() - connectTime;
         if( deltaTime > 5000 ){
             
-            tcpClient.setup(SERVER_TCP_IP, PORT);
+            tcpClient.setup(tcpServerIp, PORT);
             tcpClient.setMessageDelimiter("\n");
             
             connectTime = ofGetElapsedTimeMillis();
@@ -877,11 +937,24 @@ void ofApp::update(){
                     /*// Was isn das fŸr nen komisches Zucken ?
                      setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y , ofGetElapsedTimef()*20));*/
                     
+                    // ---------------------------------------------- LAMMPS ----------------------------------------
+                    
+                    int rgbFactor = 255;
+                    int r = l->getDiffuseColor().r*rgbFactor;
+                    int g = l->getDiffuseColor().g*rgbFactor;
+                    int b = l->getDiffuseColor().b*rgbFactor;
+                    
+                    int rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
+                    int length = sizeof(rgbs)/sizeof(*rgbs);
+                    
+                    setLammpWithRGBs(l->getMutLightId(), rgbs, length);
+                    
+                    // ----------------------------------------------------------------------------------------------
+                    
                     if (l->getMutLightId() == 0) {
                         
-                        float sine = cos(ofGetElapsedTimef()) * 0.5;
-//                        cout << "sine = " << sine << endl;
-                        setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y, l->getOrientationEuler().z - sine));
+                        float pendulum = -(cos(ofGetElapsedTimef())*0.5);
+                        setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y, l->getOrientationEuler().z - pendulum));
                         
                         ofVec3f vec;
                         
@@ -890,29 +963,7 @@ void ofApp::update(){
                         vec.z = l->getStartPosition().z;
                         l->setPosition(vec.x, vec.y, vec.z);
                         
-                        int factor = 255 * sine + 127;
-                        cout << "factor = " << factor << endl;
-                        if (i==0) {
-                            ofxOscMessage msgLammp;
-                            msgLammp.setAddress("/LAMMPS");
-                            msgLammp.addIntArg(i);
-                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().r*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().g*factor);
-                            msgLammp.addIntArg(l->getDiffuseColor().b*factor);
-                            senderToLammp->sendMessage(msgLammp);
-                        }
                     }
-                    
-                    
 //                    else if (l->getMutLightId() == 1) {
 //                        
 //                        ofVec3f vec;
@@ -923,6 +974,7 @@ void ofApp::update(){
 //                        
 //                        l->lookAt(l->getStartPosition());
 //                        l->setPosition(vec);
+//                        
 //                    }
 //                    else if (l->getMutLightId() == 2) {
 //                        
@@ -969,6 +1021,19 @@ void ofApp::update(){
             plane->fbo.end();
         }
     }
+}
+
+void ofApp::setLammpWithRGBs(int lammpId, int rgbs[], int length)
+{
+    mutLight *l = lights[lammpId];
+    
+    ofxOscMessage msgLammp;
+    msgLammp.setAddress("/LAMMPS");
+    msgLammp.addIntArg(lammpId);
+    for (int i = 0; i<length; i++) {
+        msgLammp.addIntArg(rgbs[i]);
+    }
+    senderToLammp0->sendMessage(msgLammp);
 }
 
 void ofApp::draw(){
@@ -1030,11 +1095,11 @@ void ofApp::draw(){
     
     if (tcpClient.isConnected())
     {
-        ofDrawBitmapString("TCP is connected to IP " + ofToString(SERVER_TCP_IP) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
+        ofDrawBitmapString("TCP is connected to IP " + ofToString(tcpServerIp) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
     }
     else
     {
-        ofDrawBitmapString("TCP is NOT connected to IP " + ofToString(SERVER_TCP_IP) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
+        ofDrawBitmapString("TCP is NOT connected to IP " + ofToString(tcpServerIp) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
     }
 }
 
