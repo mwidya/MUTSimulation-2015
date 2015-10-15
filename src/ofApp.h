@@ -26,7 +26,7 @@ public:
     void mouseDragged(int x, int y, int button);
     void exit();
     
-    void reset();
+    void resetLights();
     int resetTime;
     
     void drawMarker(bool on);

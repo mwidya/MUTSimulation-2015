@@ -194,6 +194,7 @@
 		EE63ED281BBE9E57009D97B9 /* ofxMidiOut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxMidiOut.cpp; sourceTree = "<group>"; };
 		EE63ED291BBE9E57009D97B9 /* ofxMidiOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMidiOut.h; sourceTree = "<group>"; };
 		EE63ED2A1BBE9E57009D97B9 /* ofxMidiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMidiTypes.h; sourceTree = "<group>"; };
+		EE68EF941BD05FF90085B8BB /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		EEF09B7D1BC3113A00932DAB /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Syphon.framework; sourceTree = "<group>"; };
 		EEF09B7F1BC3113A00932DAB /* SyphonNameboundClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyphonNameboundClient.h; sourceTree = "<group>"; };
 		EEF09B801BC3113A00932DAB /* SyphonNameboundClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyphonNameboundClient.m; sourceTree = "<group>"; };
@@ -317,6 +318,7 @@
 				EE63EC0F1BBE99A5009D97B9 /* mutLight.h */,
 				EE63EC101BBE99A5009D97B9 /* mutPlane.cpp */,
 				EE63EC111BBE99A5009D97B9 /* mutPlane.h */,
+				EE68EF941BD05FF90085B8BB /* Constants.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
