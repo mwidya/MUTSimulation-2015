@@ -37,7 +37,7 @@ public:
     void sendLightPositions();
     void sendPlanePositions();
     
-    void setLammpWithRGBs(int lammpId, int rgbs[], int length);
+    ofxOscMessage setLammpWithRGBs(int lammpId, int rgbs[], int length);
     
     void playSoundForChannel(int channel);
     void playSound();
@@ -134,10 +134,7 @@ public:
     ofxOscSender *sender8;
     ofxOscSender *sender9;
     ofxOscSender *senderToAudio;
-    ofxOscSender *senderToLammp0;
-    ofxOscSender *senderToLammp1;
-    ofxOscSender *senderToLammp2;
-    ofxOscSender *senderToLammp3;
+    ofxOscSender *senderToLammp;
     
     bool networkIsLocal;
     

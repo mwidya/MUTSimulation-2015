@@ -2,12 +2,12 @@
 
 
 //#define SERVER_TCP_IP "localhost"
-#define VIDEO_OSC_IP "localhost"
-#define AUDIO_OSC_IP "localhost"
+//#define VIDEO_OSC_IP "localhost"
+//#define AUDIO_OSC_IP "localhost"
 #define PORT 12333
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 
-#define MAX_LIGHTS 1
+#define MAX_LIGHTS 4
 
 float factor = 0.2f;
 // 1.0 = 1 meter
@@ -78,6 +78,9 @@ float normalizeValue(float min, float max, float val){
 void ofApp::sendLightPositions(){
     for (int i = 0; i<lights.size(); i++) {
         mutLight *l = lights[i];
+//        if (l->getLightID()==0) {
+//            cout << ofToString(l->getOrientationEuler().z*100000000) << endl;
+//        }
         
         float normalizedValX = normalizeValue(planes[0]->getPosition().x, planes[9]->getPosition().x, l->getPosition().x); // min = 3370, max = - 4640
         float normalizedValY = normalizeValue(planes[4]->getPosition().x + 1000, planes[3]->getPosition().x - 1000, l->getPosition().y);
@@ -86,7 +89,6 @@ void ofApp::sendLightPositions(){
         
         ofxOscMessage msgAudio;
         msgAudio.setAddress("/light"+ofToString(i)+"/position");
-        
         msgAudio.addFloatArg(normalizedValX);
         msgAudio.addFloatArg(normalizedValY);
         msgAudio.addFloatArg(normalizedValZ);
@@ -381,28 +383,22 @@ void ofApp::setupOSC(){
     sender8 = new ofxOscSender();
     sender9 = new ofxOscSender();
     senderToAudio = new ofxOscSender();
-    senderToLammp0 = new ofxOscSender();
-    senderToLammp1 = new ofxOscSender();
-    senderToLammp2 = new ofxOscSender();
-    senderToLammp3 = new ofxOscSender();
+    senderToLammp = new ofxOscSender();
     
     if (networkIsLocal) {
         
-        sender0->setup(VIDEO_OSC_IP, 6000);
-        sender1->setup(VIDEO_OSC_IP, 6001);
-        sender2->setup(VIDEO_OSC_IP, 6002);
-        sender3->setup(VIDEO_OSC_IP, 6003);
-        sender4->setup(VIDEO_OSC_IP, 6004);
-        sender5->setup(VIDEO_OSC_IP, 6005);
-        sender6->setup(VIDEO_OSC_IP, 6006);
-        sender7->setup(VIDEO_OSC_IP, 6007);
-        sender8->setup(VIDEO_OSC_IP, 6008);
-        sender9->setup(VIDEO_OSC_IP, 6009);
-        senderToAudio->setup(AUDIO_OSC_IP, 6010);
-        senderToLammp0->setup("localhost", 7000);
-        senderToLammp1->setup("localhost", 7000);
-        senderToLammp2->setup("localhost", 7000);
-        senderToLammp3->setup("localhost", 7000);
+        sender0->setup("localhost", 6000);
+        sender1->setup("localhost", 6001);
+        sender2->setup("localhost", 6002);
+        sender3->setup("localhost", 6003);
+        sender4->setup("localhost", 6004);
+        sender5->setup("localhost", 6005);
+        sender6->setup("localhost", 6006);
+        sender7->setup("localhost", 6007);
+        sender8->setup("localhost", 6008);
+        sender9->setup("localhost", 6009);
+        senderToAudio->setup("localhost", 6010);
+        senderToLammp->setup("localhost", 7000);
     }
     else{
 //        sender0->setup("10.0.0.12", 6000);
@@ -427,10 +423,7 @@ void ofApp::setupOSC(){
         sender8->setup("10.0.0.16", 6008);
         sender9->setup("10.0.0.15", 6009);
         senderToAudio->setup("10.0.0.7", 6010);
-        senderToLammp0->setup("10.0.0.21", 7000);
-        senderToLammp1->setup("10.0.0.21", 7000);
-        senderToLammp2->setup("10.0.0.21", 7000);
-        senderToLammp3->setup("10.0.0.21", 7000);
+        senderToLammp->setup("10.0.0.8", 7000);
     }
     
     senders.push_back(sender0);
@@ -629,9 +622,9 @@ void ofApp::setup(){
 void ofApp::reset(){
     
     setLightPositionAndMovementForMarkerId(lights[0], markerIds[4], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-//    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-//    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-//    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
 }
 
 void ofApp::setLightPositionAndMovementForMarkerId(mutLight *l, int markerId, ofVec2f touchPoint, int lightMovement){
@@ -801,50 +794,53 @@ void ofApp::lightCreate(mutLight *l){
 
 void ofApp::update(){
     
-//    int r0 = 222;
-//    int g0 = 134;
-//    int b0 = 122;
-//    int rgbs0[] = {r0, g0, b0, r0, g0, b0, r0, g0, b0, r0, g0, b0};
+    /*int r0 = 222;
+    int g0 = 134;
+    int b0 = 122;
+    int rgbs0[] = {r0, g0, b0, r0, g0, b0, r0, g0, b0, r0, g0, b0};
 //    setLammpWithRGBs(0, rgbs0, 12);
-//    ofxOscMessage msgLammp0;
-//    msgLammp0.setAddress("/LAMMPS");
-//    msgLammp0.addIntArg(0);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    msgLammp0.addIntArg(123);
-//    senderToLammp0->sendMessage(msgLammp0);
+    ofxOscMessage msgLammp0;
+    msgLammp0.setAddress("/LAMMPS");
+    msgLammp0.addIntArg(0);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
+    msgLammp0.addIntArg(123);
     
-//    int r1 = 23;
-//    int g1 = 55;
-//    int b1 = 233;
-//    int rgbs1[] = {r1, g1, b1, r1, g1, b1, r1, g1, b1, r1, g1, b1};
+    int r1 = 23;
+    int g1 = 55;
+    int b1 = 233;
+    int rgbs1[] = {r1, g1, b1, r1, g1, b1, r1, g1, b1, r1, g1, b1};
 //    setLammpWithRGBs(1, rgbs1, 12);
-//    ofxOscMessage msgLammp1;
-//    msgLammp1.setAddress("/LAMMPS");
-//    msgLammp1.addIntArg(1);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    msgLammp1.addIntArg(34);
-//    senderToLammp1->sendMessage(msgLammp1);
-
+    ofxOscMessage msgLammp1;
+    msgLammp1.setAddress("/LAMMPS");
+    msgLammp1.addIntArg(1);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    msgLammp1.addIntArg(34);
+    
+    ofxOscBundle bundle;
+    bundle.addMessage(msgLammp0);
+    bundle.addMessage(msgLammp1);
+    
+    senderToLammp-> sendBundle(bundle);*/
     
     if (tcpClient.isConnected())
     {
@@ -895,6 +891,8 @@ void ofApp::update(){
     // WARNING If coordinate is set to fixed value (eg. p->getPosition), every light jumps to this position.
     
     if (p != NULL) {
+        
+        ofxOscBundle bundle;
         for (int i = 0; i<lights.size(); i++) {
             mutLight *l = lights[i];
             if (l->getIsActive() == true) {
@@ -947,7 +945,8 @@ void ofApp::update(){
                     int rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
                     int length = sizeof(rgbs)/sizeof(*rgbs);
                     
-                    setLammpWithRGBs(l->getMutLightId(), rgbs, length);
+                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs, length);
+                    bundle.addMessage(msgLammp);
                     
                     // ----------------------------------------------------------------------------------------------
                     
@@ -958,47 +957,50 @@ void ofApp::update(){
                         
                         ofVec3f vec;
                         
+//                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
+//                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
                         vec.x = l->getStartPosition().x;
                         vec.y = l->getStartPosition().y;
                         vec.z = l->getStartPosition().z;
                         l->setPosition(vec.x, vec.y, vec.z);
                         
                     }
-//                    else if (l->getMutLightId() == 1) {
-//                        
-//                        ofVec3f vec;
-//                        
-//                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
-//                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
-//                        vec.z = l->getStartPosition().z;
-//                        
-//                        l->lookAt(l->getStartPosition());
-//                        l->setPosition(vec);
-//                        
-//                    }
-//                    else if (l->getMutLightId() == 2) {
-//                        
-//                        ofVec3f vec;
-//                        
-//                        vec.x = l->getStartPosition().x + sin(ofGetElapsedTimef() * 0.1f) * 5000 + 1000;
-//                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef() * 1) * 500;
-//                        vec.z = l->getStartPosition().z + sin(ofGetElapsedTimef() * 0.5f) * 500;
-//                        l->setPosition(vec.x, vec.y, vec.z);
-//                    }
-//                    
-//                    else if (l->getMutLightId() == 3) {
-//                        
-//                        ofVec3f vec;
-//                        
-//                        vec.x = l->getStartOrientation().x;
-//                        vec.y = l->getStartOrientation().y + ofGetElapsedTimef()*10;
-//                        vec.z = l->getStartOrientation().z;
-//                        setLightOri(l, vec);
-//                    }
+                    else if (l->getMutLightId() == 1) {
+                        
+                        ofVec3f vec;
+                        
+                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
+                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
+                        vec.z = l->getStartPosition().z;
+                        
+                        l->lookAt(l->getStartPosition());
+                        l->setPosition(vec);
+                        
+                    }
+                    else if (l->getMutLightId() == 2) {
+                        
+                        ofVec3f vec;
+                        
+                        vec.x = l->getStartPosition().x + sin(ofGetElapsedTimef() * 0.1f) * 5000 + 1000;
+                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef() * 1) * 500;
+                        vec.z = l->getStartPosition().z + sin(ofGetElapsedTimef() * 0.5f) * 500;
+                        l->setPosition(vec.x, vec.y, vec.z);
+                    }
+                    else if (l->getMutLightId() == 3) {
+                        
+                        ofVec3f vec;
+                        
+                        vec.x = l->getStartOrientation().x;
+                        vec.y = l->getStartOrientation().y + ofGetElapsedTimef()*10;
+                        vec.z = l->getStartOrientation().z;
+                        setLightOri(l, vec);
+                    }
                     
                 }
             }
         }
+        
+        senderToLammp-> sendBundle(bundle);
     }
     
     resetTime++;
@@ -1023,7 +1025,7 @@ void ofApp::update(){
     }
 }
 
-void ofApp::setLammpWithRGBs(int lammpId, int rgbs[], int length)
+ofxOscMessage ofApp::setLammpWithRGBs(int lammpId, int rgbs[], int length)
 {
     mutLight *l = lights[lammpId];
     
@@ -1033,7 +1035,8 @@ void ofApp::setLammpWithRGBs(int lammpId, int rgbs[], int length)
     for (int i = 0; i<length; i++) {
         msgLammp.addIntArg(rgbs[i]);
     }
-    senderToLammp0->sendMessage(msgLammp);
+    
+    return msgLammp;
 }
 
 void ofApp::draw(){
