@@ -123,20 +123,18 @@ public:
     
     
     vector<ofxOscSender*> senders;
-    ofxOscSender *sender0;
-    ofxOscSender *sender1;
-    ofxOscSender *sender2;
-    ofxOscSender *sender3;
-    ofxOscSender *sender4;
-    ofxOscSender *sender5;
-    ofxOscSender *sender6;
-    ofxOscSender *sender7;
-    ofxOscSender *sender8;
-    ofxOscSender *sender9;
-    ofxOscSender *senderToAudio;
-    ofxOscSender *senderToLammp;
-    
-    bool networkIsLocal;
+    ofxOscSender *oscSenderToClient0;
+    ofxOscSender *oscSenderToClient1;
+    ofxOscSender *oscSenderToClient2;
+    ofxOscSender *oscSenderToClient3;
+    ofxOscSender *oscSenderToClient4;
+    ofxOscSender *oscSenderToClient5;
+    ofxOscSender *oscSenderToClient6;
+    ofxOscSender *oscSenderToClient7;
+    ofxOscSender *oscSenderToClient8;
+    ofxOscSender *oscSenderToClient9;
+    ofxOscSender *oscSenderToAudio;
+    ofxOscSender *oscSenderToLammp;
     
     string tcpServerIp;
     ofxTCPClient tcpClient;

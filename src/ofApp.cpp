@@ -1,13 +1,20 @@
 #include "ofApp.h"
 
+#define TCP_NODEJS_IS_LOCAL false
 
-//#define SERVER_TCP_IP "localhost"
-//#define VIDEO_OSC_IP "localhost"
-//#define AUDIO_OSC_IP "localhost"
-#define PORT 12333
+#define OSC_CLIENTS_IS_LOCAL true
+#define OSC_AUDIO_IS_LOCAL true
+#define OSC_LAMMPS_IS_LOCAL true
+
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 
 #define MAX_LIGHTS 4
+#define PORT 12333
+
+
+
+
+
 
 float factor = 0.2f;
 // 1.0 = 1 meter
@@ -94,7 +101,7 @@ void ofApp::sendLightPositions(){
         msgAudio.addFloatArg(normalizedValZ);
         msgAudio.addFloatArg(normalizedValRotY);
         
-        senderToAudio->sendMessage(msgAudio);
+        oscSenderToAudio->sendMessage(msgAudio);
         
         for (int j = 0; j < senders.size(); j++) {
             ofxOscMessage m;
@@ -372,70 +379,66 @@ void ofApp::setupOSC(){
     
     // const int oscPorts[10] = {6000,6000,6000,6001,6000,6000,6002,6001,6000,6002};
     
-    sender0 = new ofxOscSender();
-    sender1 = new ofxOscSender();
-    sender2 = new ofxOscSender();
-    sender3 = new ofxOscSender();
-    sender4 = new ofxOscSender();
-    sender5 = new ofxOscSender();
-    sender6 = new ofxOscSender();
-    sender7 = new ofxOscSender();
-    sender8 = new ofxOscSender();
-    sender9 = new ofxOscSender();
-    senderToAudio = new ofxOscSender();
-    senderToLammp = new ofxOscSender();
+    oscSenderToClient0 = new ofxOscSender();
+    oscSenderToClient1 = new ofxOscSender();
+    oscSenderToClient2 = new ofxOscSender();
+    oscSenderToClient3 = new ofxOscSender();
+    oscSenderToClient4 = new ofxOscSender();
+    oscSenderToClient5 = new ofxOscSender();
+    oscSenderToClient6 = new ofxOscSender();
+    oscSenderToClient7 = new ofxOscSender();
+    oscSenderToClient8 = new ofxOscSender();
+    oscSenderToClient9 = new ofxOscSender();
+    oscSenderToAudio = new ofxOscSender();
+    oscSenderToLammp = new ofxOscSender();
     
-    if (networkIsLocal) {
-        
-        sender0->setup("localhost", 6000);
-        sender1->setup("localhost", 6001);
-        sender2->setup("localhost", 6002);
-        sender3->setup("localhost", 6003);
-        sender4->setup("localhost", 6004);
-        sender5->setup("localhost", 6005);
-        sender6->setup("localhost", 6006);
-        sender7->setup("localhost", 6007);
-        sender8->setup("localhost", 6008);
-        sender9->setup("localhost", 6009);
-        senderToAudio->setup("localhost", 6010);
-        senderToLammp->setup("localhost", 7000);
+    if (OSC_CLIENTS_IS_LOCAL) {
+        oscSenderToClient0->setup("localhost", 6000);
+        oscSenderToClient1->setup("localhost", 6001);
+        oscSenderToClient2->setup("localhost", 6002);
+        oscSenderToClient3->setup("localhost", 6003);
+        oscSenderToClient4->setup("localhost", 6004);
+        oscSenderToClient5->setup("localhost", 6005);
+        oscSenderToClient6->setup("localhost", 6006);
+        oscSenderToClient7->setup("localhost", 6007);
+        oscSenderToClient8->setup("localhost", 6008);
+        oscSenderToClient9->setup("localhost", 6009);
     }
     else{
-//        sender0->setup("10.0.0.12", 6000);
-//        sender1->setup("10.0.0.10", 6001);
-//        sender2->setup("10.0.0.14", 6002);
-//        sender3->setup("10.0.0.12", 6003);
-//        sender4->setup("10.0.0.11", 6004);
-//        sender5->setup("10.0.0.13", 6005);
-//        sender6->setup("10.0.0.12", 6006);
-//        sender7->setup("10.0.0.14", 6007);
-//        sender8->setup("10.0.0.15", 6008);
-//        sender9->setup("10.0.0.14", 6009);
-//        senderToAudio->setup("10.0.0.7", 6010);
-        sender0->setup("10.0.0.12", 6000);
-        sender1->setup("10.0.0.10", 6001);
-        sender2->setup("10.0.0.14", 6002);
-        sender3->setup("10.0.0.12", 6003);
-        sender4->setup("10.0.0.11", 6004);
-        sender5->setup("10.0.0.13", 6005);
-        sender6->setup("10.0.0.12", 6006);
-        sender7->setup("10.0.0.15", 6007);
-        sender8->setup("10.0.0.16", 6008);
-        sender9->setup("10.0.0.15", 6009);
-        senderToAudio->setup("10.0.0.7", 6010);
-        senderToLammp->setup("10.0.0.8", 7000);
+        oscSenderToClient0->setup("10.0.0.10", 6001);
+        oscSenderToClient1->setup("10.0.0.11", 6004);
+        oscSenderToClient2->setup("10.0.0.12", 6000);
+        oscSenderToClient3->setup("10.0.0.12", 6003);
+        oscSenderToClient4->setup("10.0.0.12", 6006);
+        oscSenderToClient5->setup("10.0.0.13", 6005);
+        oscSenderToClient6->setup("10.0.0.14", 6002);
+        oscSenderToClient7->setup("10.0.0.15", 6007);
+        oscSenderToClient8->setup("10.0.0.15", 6009);
+        oscSenderToClient9->setup("10.0.0.16", 6008);
     }
     
-    senders.push_back(sender0);
-    senders.push_back(sender1);
-    senders.push_back(sender2);
-    senders.push_back(sender3);
-    senders.push_back(sender4);
-    senders.push_back(sender5);
-    senders.push_back(sender6);
-    senders.push_back(sender7);
-    senders.push_back(sender8);
-    senders.push_back(sender9);
+    if (OSC_AUDIO_IS_LOCAL) {
+        oscSenderToAudio->setup("localhost", 6010);
+    } else {
+        oscSenderToAudio->setup("10.0.0.7", 6010);
+    }
+    
+    if (OSC_LAMMPS_IS_LOCAL) {
+        oscSenderToLammp->setup("localhost", 7000);
+    } else {
+        oscSenderToLammp->setup("10.0.0.6", 7000);
+    }
+    
+    senders.push_back(oscSenderToClient0);
+    senders.push_back(oscSenderToClient1);
+    senders.push_back(oscSenderToClient2);
+    senders.push_back(oscSenderToClient3);
+    senders.push_back(oscSenderToClient4);
+    senders.push_back(oscSenderToClient5);
+    senders.push_back(oscSenderToClient6);
+    senders.push_back(oscSenderToClient7);
+    senders.push_back(oscSenderToClient8);
+    senders.push_back(oscSenderToClient9);
     
 }
 
@@ -559,7 +562,7 @@ void ofApp::setupMIDI(){
 }
 
 void ofApp::setupTCP(){
-    if (networkIsLocal) {
+    if (TCP_NODEJS_IS_LOCAL) {
         tcpServerIp = "localhost";
     }else
     {
@@ -591,8 +594,6 @@ void ofApp::setupLights(){
 }
 
 void ofApp::setup(){
-    
-    networkIsLocal = true;
     
     setupOSC();
     
@@ -840,7 +841,7 @@ void ofApp::update(){
     bundle.addMessage(msgLammp0);
     bundle.addMessage(msgLammp1);
     
-    senderToLammp-> sendBundle(bundle);*/
+    oscSenderToClientToLammp-> sendBundle(bundle);*/
     
     if (tcpClient.isConnected())
     {
@@ -1000,7 +1001,7 @@ void ofApp::update(){
             }
         }
         
-        senderToLammp-> sendBundle(bundle);
+        oscSenderToLammp-> sendBundle(bundle);
     }
     
     resetTime++;
