@@ -30,6 +30,7 @@ public:
     int resetTime;
     
     void drawMarker(bool on);
+    void showInfo(bool on);
     
     ofVec3f getLightOri(ofQuaternion *quat);
     void setLightOri(ofLight *light, ofVec3f rot);
@@ -148,6 +149,7 @@ public:
     
     bool isSyphonOutput = true;
     bool markerOn = true;
+    bool infoOn = true;
     bool drawNormals = false;
     bool drawLights = true;
 };

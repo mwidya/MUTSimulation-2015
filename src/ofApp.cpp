@@ -1,7 +1,6 @@
 #include "ofApp.h"
 
-#define TCP_NODEJS_IS_LOCAL false
-
+#define TCP_NODEJS_IS_LOCAL true
 #define OSC_CLIENTS_IS_LOCAL true
 #define OSC_AUDIO_IS_LOCAL true
 #define OSC_LAMMPS_IS_LOCAL true
@@ -392,17 +391,19 @@ void ofApp::setupOSC(){
     oscSenderToAudio = new ofxOscSender();
     oscSenderToLammp = new ofxOscSender();
     
+    string oscLocalIp = "localhost";
+    
     if (OSC_CLIENTS_IS_LOCAL) {
-        oscSenderToClient0->setup("localhost", 6000);
-        oscSenderToClient1->setup("localhost", 6001);
-        oscSenderToClient2->setup("localhost", 6002);
-        oscSenderToClient3->setup("localhost", 6003);
-        oscSenderToClient4->setup("localhost", 6004);
-        oscSenderToClient5->setup("localhost", 6005);
-        oscSenderToClient6->setup("localhost", 6006);
-        oscSenderToClient7->setup("localhost", 6007);
-        oscSenderToClient8->setup("localhost", 6008);
-        oscSenderToClient9->setup("localhost", 6009);
+        oscSenderToClient0->setup(oscLocalIp, 6000);
+        oscSenderToClient1->setup(oscLocalIp, 6001);
+        oscSenderToClient2->setup(oscLocalIp, 6002);
+        oscSenderToClient3->setup(oscLocalIp, 6003);
+        oscSenderToClient4->setup(oscLocalIp, 6004);
+        oscSenderToClient5->setup(oscLocalIp, 6005);
+        oscSenderToClient6->setup(oscLocalIp, 6006);
+        oscSenderToClient7->setup(oscLocalIp, 6007);
+        oscSenderToClient8->setup(oscLocalIp, 6008);
+        oscSenderToClient9->setup(oscLocalIp, 6009);
     }
     else{
         oscSenderToClient0->setup("10.0.0.10", 6001);
@@ -418,13 +419,13 @@ void ofApp::setupOSC(){
     }
     
     if (OSC_AUDIO_IS_LOCAL) {
-        oscSenderToAudio->setup("localhost", 6010);
+        oscSenderToAudio->setup(oscLocalIp, 6010);
     } else {
         oscSenderToAudio->setup("10.0.0.7", 6010);
     }
     
     if (OSC_LAMMPS_IS_LOCAL) {
-        oscSenderToLammp->setup("localhost", 7000);
+        oscSenderToLammp->setup(oscLocalIp, 7000);
     } else {
         oscSenderToLammp->setup("10.0.0.6", 7000);
     }
@@ -1137,6 +1138,11 @@ void ofApp::keyPressed(int key){
         markerOn = !markerOn;
         drawMarker(markerOn);
     }
+    if (key == 'i') {
+        
+        infoOn = !infoOn;
+        showInfo(infoOn);
+    }
     
     if (key == 's') {
         isSyphonOutput = !isSyphonOutput;
@@ -1146,6 +1152,15 @@ void ofApp::keyPressed(int key){
 void ofApp::drawMarker(bool on){
     ofxOscMessage m;
     m.setAddress("/marker/on");
+    m.addIntArg(on);
+    for(int i = 0; i<senders.size(); i++){
+        senders[i]->sendMessage(m);
+    }
+    
+}
+void ofApp::showInfo(bool on){
+    ofxOscMessage m;
+    m.setAddress("/info/on");
     m.addIntArg(on);
     for(int i = 0; i<senders.size(); i++){
         senders[i]->sendMessage(m);
