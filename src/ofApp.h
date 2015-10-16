@@ -142,6 +142,9 @@ public:
     int deltaTime = 0;
     int connectTime = 0;
     
+    int animationState = 0;
+    int animationDeltaTime = 0;
+    int animationSwitchStateTime = 0;
     
     ofSoundPlayer soundPlayer;
     

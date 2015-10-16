@@ -8,7 +8,7 @@
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 
 #define MAX_LIGHTS 4
-#define PORT 12333
+#define LOOP_LENGTH 7200
 
 // -------------------------------------------------- Setup -------------------------------------------------------
 #pragma mark - Setup
@@ -208,7 +208,7 @@ void ofApp::setupTCP(){
     {
         tcpServerIp = "10.0.0.5";
     }
-    tcpClient.setup(tcpServerIp, PORT);
+    tcpClient.setup(tcpServerIp, 12333);
     tcpClient.setMessageDelimiter("\n");
 }
 
@@ -260,8 +260,8 @@ void ofApp::setup(){
     
 }
 
-// -------------------------------------------------- Update / Draw / Events -------------------------------------------------------
-#pragma mark - Update / Draw / Events
+// -------------------------------------------------- Moving Lights -------------------------------------------------------
+#pragma mark - Moving Lights
 
 void ofApp::update(){
     
@@ -304,7 +304,7 @@ void ofApp::update(){
         deltaTime = ofGetElapsedTimeMillis() - connectTime;
         if( deltaTime > 5000 ){
             
-            tcpClient.setup(tcpServerIp, PORT);
+            tcpClient.setup(tcpServerIp, 12333);
             tcpClient.setMessageDelimiter("\n");
             
             connectTime = ofGetElapsedTimeMillis();
@@ -320,6 +320,7 @@ void ofApp::update(){
         for (int i = 0; i<lights.size(); i++) {
             mutLight *l = lights[i];
             if (l->getIsActive() == true) {
+                
                 if (l->getStatus() == LIGHT_STATUS_LIVES) {
                     
                     l->setLifetime(ofGetElapsedTimef() - l->getCreationtime());
@@ -376,18 +377,40 @@ void ofApp::update(){
                     
                     if (l->getMutLightId() == 0) {
                         
-                        float pendulum = -(cos(ofGetElapsedTimef())*0.5);
-                        setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y, l->getOrientationEuler().z - pendulum));
-                        
-                        ofVec3f vec;
-                        
-                        //                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
-                        //                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
-                        vec.x = l->getStartPosition().x;
-                        vec.y = l->getStartPosition().y;
-                        vec.z = l->getStartPosition().z;
-                        l->setPosition(vec.x, vec.y, vec.z);
-                        
+                        animationDeltaTime = ofGetElapsedTimeMillis() - animationSwitchStateTime;
+                        if (animationDeltaTime>5000) {
+                            animationState++;
+                            animationSwitchStateTime = ofGetElapsedTimeMillis();
+                        }
+                        if (animationState == 1) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z - 0.1;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 2) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z + 0.1;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 3) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x+5;
+                            vec.y = l->getPosition().y+5;
+                            vec.z = l->getPosition().z+5;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 4) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x-5;
+                            vec.y = l->getPosition().y-5;
+                            vec.z = l->getPosition().z-5;
+                            l->setPosition(vec);
+
+                        }
                     }
                     else if (l->getMutLightId() == 1) {
                         
@@ -429,7 +452,7 @@ void ofApp::update(){
     
     resetTime++;
     
-    if (resetTime>60*60) {
+    if (resetTime>LOOP_LENGTH) {
         resetLights();
         resetTime = 0;
     }
@@ -449,140 +472,26 @@ void ofApp::update(){
     }
 }
 
-void ofApp::draw(){
-    ofClear(0, 0, 0);
+void ofApp::resetLights(){
     
-    
-    ofEnableDepthTest();
-    
-    easyCam.begin();
-    
-    if (isSyphonOutput) {
-        for (int i = 0; i < planes.size(); i++) {
-            mutPlane *plane = planes[i];
-            if (plane->isAnnounced) {
-                plane->fbo.getTextureReference().bind();
-                plane->mapTexCoordsFromTexture(plane->fbo.getTextureReference());
-                plane->draw();
-                plane->fbo.getTextureReference().unbind();
-            }else{
-                plane->draw();
-            }
-            
-            if (drawNormals) {
-                ofSetColor(0);
-                plane->drawNormals(50);
-                ofSetColor(255);
-            }
-        }
-    }
-    else{
-        
-        material.begin();
-        
-        for (int i = 0; i < planes.size(); i++) {
-            mutPlane *plane = planes[i];
-            plane->draw();
-            
-            if (drawNormals) {
-                ofSetColor(0);
-                plane->drawNormals(50);
-                ofSetColor(255);
-            }
-        }
-    }
-    
-    if (drawLights) {
-        for (int i = 0; i<lights.size(); i++) {
-            if (lights[i]->getIsActive()) {
-                lights[i]->draw();
-            }
-        }
-    }
-    
-    material.end();
-    
-    easyCam.end();
-    
-    ofDisableDepthTest();
-    
-    if (tcpClient.isConnected())
-    {
-        ofDrawBitmapString("TCP is connected to IP " + ofToString(tcpServerIp) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
-    }
-    else
-    {
-        ofDrawBitmapString("TCP is NOT connected to IP " + ofToString(tcpServerIp) + " on port " + ofToString(PORT) , 20, ofGetHeight()-20);
-    }
+    setLightPositionAndMovementForMarkerId(lights[0], markerIds[4], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    //    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    //    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    //    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
 }
 
-void ofApp::keyPressed(int key){
+void ofApp::lightCreate(mutLight *l){
     
-    if (key=='r') {
-        resetLights();
-    }
-    
-    if (key == 'n') {
-        drawNormals = !drawNormals;
-    }
-    
-    if (key == 'p') {
-        playSound();
-    }
-    if (key == 'a') {
-        allNotesOffFoChannel(3);
-    }
-    
-    if (key == 'l'){
-        drawLights = !drawLights;
-    }
-    
-    if (key == 't') {
-        sendPlanePositions();
-    }
-    
-    if (key == 'm') {
-        
-        markerOn = !markerOn;
-        drawMarker(markerOn);
-    }
-    if (key == 'i') {
-        
-        infoOn = !infoOn;
-        showInfo(infoOn);
-    }
-    
-    if (key == 's') {
-        isSyphonOutput = !isSyphonOutput;
-    }
+    l->enable();
+    l->setCreationtime(ofGetElapsedTimef());
+    l->setIsActive(true);
+    l->setDiffuseColor(ofColor(ofRandom(255.0f), ofRandom(255.0f), ofRandom(255.0f)));
+    l->setStartPosition(l->getPosition());
+    l->setTargetPosition(l->getStartPosition());
+    l->setStartOrientation(l->getOrientationEuler());
+    l->setTargetOrientation(l->getStartOrientation());
+    l->setStatus(LIGHT_STATUS_LIVES);
 }
-
-void ofApp::drawMarker(bool on){
-    ofxOscMessage m;
-    m.setAddress("/marker/on");
-    m.addIntArg(on);
-    for(int i = 0; i<senders.size(); i++){
-        senders[i]->sendMessage(m);
-    }
-    
-}
-
-void ofApp::showInfo(bool on){
-    ofxOscMessage m;
-    m.setAddress("/info/on");
-    m.addIntArg(on);
-    for(int i = 0; i<senders.size(); i++){
-        senders[i]->sendMessage(m);
-    }
-    
-}
-
-void ofApp::mouseDragged(int x, int y, int button){
-    
-}
-
-// -------------------------------------------------- Moving Lights -------------------------------------------------------
-#pragma mark - Moving Lights
 
 void ofApp::setLightOri(ofLight *light, ofVec3f rot){
     ofVec3f xax(1, 0, 0);
@@ -591,14 +500,6 @@ void ofApp::setLightOri(ofLight *light, ofVec3f rot){
     ofQuaternion q;
     q.makeRotate(rot.x, xax, rot.y, yax, rot.z, zax);
     light->setOrientation(q);
-}
-
-void ofApp::resetLights(){
-    
-    setLightPositionAndMovementForMarkerId(lights[0], markerIds[4], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
 }
 
 void ofApp::setLightPositionAndMovementForMarkerId(mutLight *l, int markerId, ofVec2f touchPoint, int lightMovement){
@@ -751,19 +652,6 @@ void ofApp::lightDies(mutLight*l){
     l->setIsActive(false);
     l->setLifetime(0.0f);
     l->setStatus(LIGHT_STATUS_DEAD);
-}
-
-void ofApp::lightCreate(mutLight *l){
-    
-    l->enable();
-    l->setCreationtime(ofGetElapsedTimef());
-    l->setIsActive(true);
-    l->setDiffuseColor(ofColor(ofRandom(255.0f), ofRandom(255.0f), ofRandom(255.0f)));
-    l->setStartPosition(l->getPosition());
-    l->setTargetPosition(l->getStartPosition());
-    l->setStartOrientation(l->getOrientationEuler());
-    l->setTargetOrientation(l->getStartOrientation());
-    l->setStatus(LIGHT_STATUS_LIVES);
 }
 
 ofxOscMessage ofApp::setLammpWithRGBs(int lammpId, int rgbs[], int length){
@@ -1079,6 +967,143 @@ void ofApp::playSound(){
     for (int c = 1; c<=MAX_LIGHTS; c++) {
         playNote(note, velocity, c);
     }
+}
+
+// -------------------------------------------------- Draw / Events -------------------------------------------------------
+#pragma mark - Update / Draw / Events
+
+void ofApp::draw(){
+    ofClear(0, 0, 0);
+    
+    
+    ofEnableDepthTest();
+    
+    easyCam.begin();
+    
+    if (isSyphonOutput) {
+        for (int i = 0; i < planes.size(); i++) {
+            mutPlane *plane = planes[i];
+            if (plane->isAnnounced) {
+                plane->fbo.getTextureReference().bind();
+                plane->mapTexCoordsFromTexture(plane->fbo.getTextureReference());
+                plane->draw();
+                plane->fbo.getTextureReference().unbind();
+            }else{
+                plane->draw();
+            }
+            
+            if (drawNormals) {
+                ofSetColor(0);
+                plane->drawNormals(50);
+                ofSetColor(255);
+            }
+        }
+    }
+    else{
+        
+        material.begin();
+        
+        for (int i = 0; i < planes.size(); i++) {
+            mutPlane *plane = planes[i];
+            plane->draw();
+            
+            if (drawNormals) {
+                ofSetColor(0);
+                plane->drawNormals(50);
+                ofSetColor(255);
+            }
+        }
+    }
+    
+    if (drawLights) {
+        for (int i = 0; i<lights.size(); i++) {
+            if (lights[i]->getIsActive()) {
+                lights[i]->draw();
+            }
+        }
+    }
+    
+    material.end();
+    
+    easyCam.end();
+    
+    ofDisableDepthTest();
+    
+    ofDrawBitmapString("Animationstate " + ofToString(animationState), 20, ofGetHeight()-40);
+    
+    if (tcpClient.isConnected())
+    {
+        ofDrawBitmapString("TCP is connected to IP " + ofToString(tcpServerIp) + " on port " + ofToString(12333) , 20, ofGetHeight()-20);
+    }
+    else
+    {
+        ofDrawBitmapString("TCP is NOT connected to IP " + ofToString(tcpServerIp) + " on port " + ofToString(12333) , 20, ofGetHeight()-20);
+    }
+}
+
+void ofApp::keyPressed(int key){
+    
+    if (key=='r') {
+        resetLights();
+    }
+    
+    if (key == 'n') {
+        drawNormals = !drawNormals;
+    }
+    
+    if (key == 'p') {
+        playSound();
+    }
+    if (key == 'a') {
+        allNotesOffFoChannel(3);
+    }
+    
+    if (key == 'l'){
+        drawLights = !drawLights;
+    }
+    
+    if (key == 't') {
+        sendPlanePositions();
+    }
+    
+    if (key == 'm') {
+        
+        markerOn = !markerOn;
+        drawMarker(markerOn);
+    }
+    if (key == 'i') {
+        
+        infoOn = !infoOn;
+        showInfo(infoOn);
+    }
+    
+    if (key == 's') {
+        isSyphonOutput = !isSyphonOutput;
+    }
+}
+
+void ofApp::drawMarker(bool on){
+    ofxOscMessage m;
+    m.setAddress("/marker/on");
+    m.addIntArg(on);
+    for(int i = 0; i<senders.size(); i++){
+        senders[i]->sendMessage(m);
+    }
+    
+}
+
+void ofApp::showInfo(bool on){
+    ofxOscMessage m;
+    m.setAddress("/info/on");
+    m.addIntArg(on);
+    for(int i = 0; i<senders.size(); i++){
+        senders[i]->sendMessage(m);
+    }
+    
+}
+
+void ofApp::mouseDragged(int x, int y, int button){
+    
 }
 
 // -------------------------------------------------- Syphon Callbacks --------------------------------------------
