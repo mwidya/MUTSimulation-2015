@@ -155,4 +155,6 @@ public:
     bool infoOn = true;
     bool drawNormals = false;
     bool drawLights = true;
+    
+    bool isMoving = false;
 };

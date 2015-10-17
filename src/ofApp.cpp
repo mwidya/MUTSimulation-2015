@@ -4,7 +4,7 @@
 #define TCP_NODEJS_IS_LOCAL true
 #define OSC_CLIENTS_IS_LOCAL true
 #define OSC_AUDIO_IS_LOCAL true
-#define OSC_LAMMPS_IS_LOCAL false
+#define OSC_LAMMPS_IS_LOCAL true
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 //#define MIDI_DEVICE_NAME "MIDISPORT 4x4 Port A"
 
@@ -294,7 +294,6 @@ void ofApp::update(){
                     mutLight *l = lights[i];
                     
                     if (l->getMutLightId() == mutLightID) {
-                        
                         setLightPositionAndMovementForMarkerId(l, markerId, touchPoint, LIGHT_MOVEMENT_POINT_TO_POINT);
                         resetTime = 0;
                     }
@@ -378,35 +377,49 @@ void ofApp::update(){
                     
                     if (l->getMutLightId() == 0) {
                         
-                        if (animationState == 0) {
+                        if (animationState == 1) {
                             ofVec3f ori;
                             ori.x = l->getOrientationEuler().x;
                             ori.y = l->getOrientationEuler().y;
                             ori.z = l->getOrientationEuler().z - 0.1;
                             setLightOri(l, ori);
                         }
-                        if (animationState == 1) {
+                        if (animationState == 2) {
                             ofVec3f ori;
                             ori.x = l->getOrientationEuler().x;
                             ori.y = l->getOrientationEuler().y;
                             ori.z = l->getOrientationEuler().z + 0.1;
                             setLightOri(l, ori);
                         }
-                        if (animationState == 2) {
+                        if (animationState == 3) {
                             ofVec3f vec;
                             vec.x = l->getPosition().x+5;
                             vec.y = l->getPosition().y+5;
                             vec.z = l->getPosition().z+5;
                             l->setPosition(vec);
                         }
-                        if (animationState == 3) {
+                        if (animationState == 4) {
                             ofVec3f vec;
                             vec.x = l->getPosition().x-5;
                             vec.y = l->getPosition().y-5;
                             vec.z = l->getPosition().z-5;
                             l->setPosition(vec);
                         }
-                        if (animationState > 3) {
+                        if (animationState == 5) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 6) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState > 7) {
                             ofVec3f ori;
                             ori.x = l->getOrientationEuler().x;
                             ori.y = l->getOrientationEuler().y;
@@ -414,43 +427,178 @@ void ofApp::update(){
                             setLightOri(l, ori);
                         }
                         
-                        animationDeltaTime = ofGetElapsedTimeMillis() - animationSwitchStateTime;
-                        if (animationDeltaTime>5000) {
-                            animationState++;
-                            animationSwitchStateTime = ofGetElapsedTimeMillis();
-                        }
+                        cout << "l->getOrientationEuler().z = " << l->getOrientationEuler().z * 10000000 << endl;
+                        
                     }
                     else if (l->getMutLightId() == 1) {
                         
-                        ofVec3f vec;
+                        if (animationState == 1) {
+                            ofVec3f vec;
+                            
+                            vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 10;
+                            vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 10;
+                            vec.z = l->getStartPosition().z;
+                            
+                            l->lookAt(l->getStartPosition());
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 2) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.1;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 3) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x+5;
+                            vec.y = l->getPosition().y+10;
+                            vec.z = l->getPosition().z+5;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 4) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x-5;
+                            vec.y = l->getPosition().y-10;
+                            vec.z = l->getPosition().z-5;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 5) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 6) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState > 7) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z + cos(ofGetElapsedTimef());
+                            setLightOri(l, ori);
+                        }
                         
-                        vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 1000;
-                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 1000;
-                        vec.z = l->getStartPosition().z;
-                        
-                        l->lookAt(l->getStartPosition());
-                        l->setPosition(vec);
                         
                     }
                     else if (l->getMutLightId() == 2) {
                         
-                        ofVec3f vec;
-                        
-                        vec.x = l->getStartPosition().x + sin(ofGetElapsedTimef() * 0.1f) * 5000 + 1000;
-                        vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef() * 1) * 500;
-                        vec.z = l->getStartPosition().z + sin(ofGetElapsedTimef() * 0.5f) * 500;
-                        l->setPosition(vec.x, vec.y, vec.z);
+                        if (animationState == 1) {
+                            ofVec3f vec;
+                            vec.x = l->getStartPosition().x + cos(ofGetElapsedTimef()) * 10;
+                            vec.y = l->getStartPosition().y + sin(ofGetElapsedTimef()) * 10;
+                            vec.z = l->getStartPosition().z;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 2) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.1;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 3) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x - 0.1;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 4) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x-5;
+                            vec.y = l->getPosition().y-10;
+                            vec.z = l->getPosition().z-5;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 5) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 6) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState > 7) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z + cos(ofGetElapsedTimef()) * 0.1;
+                            setLightOri(l, ori);
+                        }
                     }
                     else if (l->getMutLightId() == 3) {
                         
-                        ofVec3f vec;
-                        
-                        vec.x = l->getStartOrientation().x;
-                        vec.y = l->getStartOrientation().y + ofGetElapsedTimef()*10;
-                        vec.z = l->getStartOrientation().z;
-                        setLightOri(l, vec);
+                        if (animationState == 1) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.1;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 2) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x - 0.1;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState == 3) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x+0.5;
+                            vec.y = l->getPosition().y+1;
+                            vec.z = l->getPosition().z+5;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 4) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x-0.5;
+                            vec.y = l->getPosition().y-1;
+                            vec.z = l->getPosition().z-5;
+                            l->setPosition(vec);
+                        }
+                        if (animationState == 5) {
+                            
+                            ofVec3f vec;
+                            
+                            vec.x = l->getStartOrientation().x;
+                            vec.y = l->getStartOrientation().y + ofGetElapsedTimef()*10;
+                            vec.z = l->getStartOrientation().z;
+                            setLightOri(l, vec);
+                        }
+                        if (animationState == 6) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x + 0.2;
+                            ori.y = l->getOrientationEuler().y + 0.2;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
+                        if (animationState > 7) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x - 0.5;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z;
+                            setLightOri(l, ori);
+                        }
                     }
                     
+                    animationDeltaTime = ofGetElapsedTimeMillis() - animationSwitchStateTime;
+                    if (animationDeltaTime>5000) {
+                        animationState++;
+                        animationSwitchStateTime = ofGetElapsedTimeMillis();
+                    }
                 }
             }
         }
@@ -486,6 +634,8 @@ void ofApp::resetLights(){
     setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
     setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
     setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    
+    animationState = 0;
 }
 
 void ofApp::lightCreate(mutLight *l){
@@ -1062,9 +1212,6 @@ void ofApp::keyPressed(int key){
     if (key == 'p') {
         playSound();
     }
-    if (key == 'a') {
-        allNotesOffFoChannel(3);
-    }
     
     if (key == 'l'){
         drawLights = !drawLights;
@@ -1087,6 +1234,18 @@ void ofApp::keyPressed(int key){
     
     if (key == 's') {
         isSyphonOutput = !isSyphonOutput;
+    }
+    if (key == '1') {
+        allNotesOffFoChannel(1);
+    }
+    if (key == '2') {
+        allNotesOffFoChannel(2);
+    }
+    if (key == '3') {
+        allNotesOffFoChannel(3);
+    }
+    if (key == '4') {
+        allNotesOffFoChannel(4);
     }
 }
 
