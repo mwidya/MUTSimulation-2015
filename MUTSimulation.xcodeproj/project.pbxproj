@@ -57,6 +57,7 @@
 		EE63ED421BBE9E57009D97B9 /* ofxMidiIn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EE63ED241BBE9E57009D97B9 /* ofxMidiIn.cpp */; };
 		EE63ED431BBE9E57009D97B9 /* ofxMidiMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EE63ED261BBE9E57009D97B9 /* ofxMidiMessage.cpp */; };
 		EE63ED441BBE9E57009D97B9 /* ofxMidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EE63ED281BBE9E57009D97B9 /* ofxMidiOut.cpp */; };
+		EEEA31471BD2864C00448939 /* lammpsLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EEEA31451BD2864C00448939 /* lammpsLight.cpp */; };
 		EEF09B901BC3113B00932DAB /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEF09B7D1BC3113A00932DAB /* Syphon.framework */; };
 		EEF09B911BC3113B00932DAB /* SyphonNameboundClient.m in Sources */ = {isa = PBXBuildFile; fileRef = EEF09B801BC3113A00932DAB /* SyphonNameboundClient.m */; };
 		EEF09B931BC3113B00932DAB /* ofxSyphonClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = EEF09B861BC3113A00932DAB /* ofxSyphonClient.mm */; };
@@ -195,6 +196,8 @@
 		EE63ED291BBE9E57009D97B9 /* ofxMidiOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMidiOut.h; sourceTree = "<group>"; };
 		EE63ED2A1BBE9E57009D97B9 /* ofxMidiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxMidiTypes.h; sourceTree = "<group>"; };
 		EE68EF941BD05FF90085B8BB /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		EEEA31451BD2864C00448939 /* lammpsLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lammpsLight.cpp; sourceTree = "<group>"; };
+		EEEA31461BD2864C00448939 /* lammpsLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lammpsLight.h; sourceTree = "<group>"; };
 		EEF09B7D1BC3113A00932DAB /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Syphon.framework; sourceTree = "<group>"; };
 		EEF09B7F1BC3113A00932DAB /* SyphonNameboundClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyphonNameboundClient.h; sourceTree = "<group>"; };
 		EEF09B801BC3113A00932DAB /* SyphonNameboundClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyphonNameboundClient.m; sourceTree = "<group>"; };
@@ -319,6 +322,8 @@
 				EE63EC101BBE99A5009D97B9 /* mutPlane.cpp */,
 				EE63EC111BBE99A5009D97B9 /* mutPlane.h */,
 				EE68EF941BD05FF90085B8BB /* Constants.h */,
+				EEEA31451BD2864C00448939 /* lammpsLight.cpp */,
+				EEEA31461BD2864C00448939 /* lammpsLight.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -748,6 +753,7 @@
 				EE63EBF21BBE994C009D97B9 /* ofxOscReceiver.cpp in Sources */,
 				EE63EBE91BBE994C009D97B9 /* NetworkingUtilsWin.cpp in Sources */,
 				EE63EBEE1BBE994C009D97B9 /* OscTypes.cpp in Sources */,
+				EEEA31471BD2864C00448939 /* lammpsLight.cpp in Sources */,
 				EE63EBF01BBE994C009D97B9 /* ofxOscMessage.cpp in Sources */,
 				EEF09B911BC3113B00932DAB /* SyphonNameboundClient.m in Sources */,
 				EE63ED431BBE9E57009D97B9 /* ofxMidiMessage.cpp in Sources */,

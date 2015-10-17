@@ -8,6 +8,7 @@
 #include "ofxJSONElement.h"
 #include "mutLight.h"
 #include "ofxMidi.h"
+#include "lammpsLight.h"
 
 class ofApp : public ofBaseApp{
     

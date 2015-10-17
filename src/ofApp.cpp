@@ -317,7 +317,7 @@ void ofApp::update(){
     
     if (p != NULL) {
         
-        ofxOscBundle bundle;
+//        ofxOscBundle bundle;
         
         for (int i = 0; i<lights.size(); i++) {
             mutLight *l = lights[i];
@@ -361,19 +361,22 @@ void ofApp::update(){
                     
                     /*// Was isn das fŸr nen komisches Zucken ?
                      setLightOri(l, ofVec3f(l->getOrientationEuler().x, l->getOrientationEuler().y , ofGetElapsedTimef()*20));*/
-                    
-                    // ---------------------------------------------- LAMMPS ----------------------------------------
-                    
-                    float r = l->getDiffuseColor().r;
-                    float g = l->getDiffuseColor().g;
-                    float b = l->getDiffuseColor().b;
-                    
-                    float rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
-                    
-                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs);
-                    bundle.addMessage(msgLammp);
-                    
-                    // ----------------------------------------------------------------------------------------------
+//                    
+//                    // ---------------------------------------------- LAMMPS ----------------------------------------
+//                    
+//                    float r = l->getDiffuseColor().r;
+//                    float g = l->getDiffuseColor().g;
+//                    float b = l->getDiffuseColor().b;
+//                    
+////                    float rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
+////                    
+////                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs);
+//                    
+//                    lammpsLight *light = new lammpsLight();
+//                    light->setColor(ofVec3f(r,g,b));
+//                    bundle.addMessage(light->getOscMessage());
+//                    
+//                    // ----------------------------------------------------------------------------------------------
                     
                     if (l->getMutLightId() == 0) {
                         
@@ -603,7 +606,7 @@ void ofApp::update(){
             }
         }
         
-        oscSenderToLammp-> sendBundle(bundle);
+//        oscSenderToLammp-> sendBundle(bundle);
     }
     
     resetTime++;
@@ -635,13 +638,36 @@ void ofApp::resetLights(){
 //    setLightPositionAndMovementForMarkerId(lights[2], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
 //    setLightPositionAndMovementForMarkerId(lights[3], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
     
+    
+    ofxOscBundle bundle;
     for (int i = 0; i<4; i++) {
-        mutLight *light = lights[i];
-        setLightPositionAndMovementForMarkerId(light, markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-        light->setDiffuseColor(ofColor(ofRandom(255.0f), ofRandom(255.0f), ofRandom(255.0f)));
+        mutLight *l = lights[i];
+        setLightPositionAndMovementForMarkerId(l, markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+        l->setDiffuseColor(ofColor(ofRandom(255.0f), ofRandom(255.0f), ofRandom(255.0f)));
+        
+        
+        // ---------------------------------------------- LAMMPS ----------------------------------------
+        
+        float r = l->getDiffuseColor().r;
+        float g = l->getDiffuseColor().g;
+        float b = l->getDiffuseColor().b;
+        
+        //                    float rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
+        //
+        //                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs);
+        
+        lammpsLight *light = new lammpsLight();
+        light->setLammpsLightId(i);
+        light->setColor(ofVec3f(r,g,b));
+        bundle.addMessage(light->getOscMessage());
+        
+        // ----------------------------------------------------------------------------------------------
     }
+    oscSenderToLammp-> sendBundle(bundle);
     
     animationState = 0;
+    
+    
 }
 
 void ofApp::lightCreate(mutLight *l){
