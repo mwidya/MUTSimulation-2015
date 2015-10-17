@@ -38,7 +38,7 @@ public:
     void sendLightPositions();
     void sendPlanePositions();
     
-    ofxOscMessage setLammpWithRGBs(int lammpId, int rgbs[], int length);
+    ofxOscMessage setLammpWithRGBs(int lammpId, float rgbs[]);
     
     void playSoundForChannel(int channel);
     void playSound();

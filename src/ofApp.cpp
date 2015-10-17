@@ -4,11 +4,12 @@
 #define TCP_NODEJS_IS_LOCAL true
 #define OSC_CLIENTS_IS_LOCAL true
 #define OSC_AUDIO_IS_LOCAL true
-#define OSC_LAMMPS_IS_LOCAL true
+#define OSC_LAMMPS_IS_LOCAL false
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
+//#define MIDI_DEVICE_NAME "MIDISPORT 4x4 Port A"
 
 #define MAX_LIGHTS 4
-#define LOOP_LENGTH 7200
+#define LOOP_LENGTH 3600
 
 // -------------------------------------------------- Setup -------------------------------------------------------
 #pragma mark - Setup
@@ -285,6 +286,8 @@ void ofApp::update(){
             
             if (((event == "press") && isNormedX && isNormedY)) {
                 
+//                allNotesOff();
+                
                 mutLightID  = (mutLightID+1) % MAX_LIGHTS;
                 
                 for (int i = 0; i<lights.size(); i++) {
@@ -362,54 +365,59 @@ void ofApp::update(){
                     
                     // ---------------------------------------------- LAMMPS ----------------------------------------
                     
-                    int rgbFactor = 255;
-                    int r = l->getDiffuseColor().r*rgbFactor;
-                    int g = l->getDiffuseColor().g*rgbFactor;
-                    int b = l->getDiffuseColor().b*rgbFactor;
+                    float r = l->getDiffuseColor().r;
+                    float g = l->getDiffuseColor().g;
+                    float b = l->getDiffuseColor().b;
                     
-                    int rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
-                    int length = sizeof(rgbs)/sizeof(*rgbs);
+                    float rgbs[] = {r, g, b, r, g, b, r, g, b, r, g, b};
                     
-                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs, length);
+                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs);
                     bundle.addMessage(msgLammp);
                     
                     // ----------------------------------------------------------------------------------------------
                     
                     if (l->getMutLightId() == 0) {
                         
-                        animationDeltaTime = ofGetElapsedTimeMillis() - animationSwitchStateTime;
-                        if (animationDeltaTime>5000) {
-                            animationState++;
-                            animationSwitchStateTime = ofGetElapsedTimeMillis();
-                        }
-                        if (animationState == 1) {
+                        if (animationState == 0) {
                             ofVec3f ori;
                             ori.x = l->getOrientationEuler().x;
                             ori.y = l->getOrientationEuler().y;
                             ori.z = l->getOrientationEuler().z - 0.1;
                             setLightOri(l, ori);
                         }
-                        if (animationState == 2) {
+                        if (animationState == 1) {
                             ofVec3f ori;
                             ori.x = l->getOrientationEuler().x;
                             ori.y = l->getOrientationEuler().y;
                             ori.z = l->getOrientationEuler().z + 0.1;
                             setLightOri(l, ori);
                         }
-                        if (animationState == 3) {
+                        if (animationState == 2) {
                             ofVec3f vec;
                             vec.x = l->getPosition().x+5;
                             vec.y = l->getPosition().y+5;
                             vec.z = l->getPosition().z+5;
                             l->setPosition(vec);
                         }
-                        if (animationState == 4) {
+                        if (animationState == 3) {
                             ofVec3f vec;
                             vec.x = l->getPosition().x-5;
                             vec.y = l->getPosition().y-5;
                             vec.z = l->getPosition().z-5;
                             l->setPosition(vec);
-
+                        }
+                        if (animationState > 3) {
+                            ofVec3f ori;
+                            ori.x = l->getOrientationEuler().x;
+                            ori.y = l->getOrientationEuler().y;
+                            ori.z = l->getOrientationEuler().z + cos(ofGetElapsedTimef());
+                            setLightOri(l, ori);
+                        }
+                        
+                        animationDeltaTime = ofGetElapsedTimeMillis() - animationSwitchStateTime;
+                        if (animationDeltaTime>5000) {
+                            animationState++;
+                            animationSwitchStateTime = ofGetElapsedTimeMillis();
                         }
                     }
                     else if (l->getMutLightId() == 1) {
@@ -475,9 +483,9 @@ void ofApp::update(){
 void ofApp::resetLights(){
     
     setLightPositionAndMovementForMarkerId(lights[0], markerIds[4], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    //    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    //    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    //    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
 }
 
 void ofApp::lightCreate(mutLight *l){
@@ -654,14 +662,14 @@ void ofApp::lightDies(mutLight*l){
     l->setStatus(LIGHT_STATUS_DEAD);
 }
 
-ofxOscMessage ofApp::setLammpWithRGBs(int lammpId, int rgbs[], int length){
+ofxOscMessage ofApp::setLammpWithRGBs(int lammpId, float rgbs[]){
     mutLight *l = lights[lammpId];
     
     ofxOscMessage msgLammp;
     msgLammp.setAddress("/LAMMPS");
     msgLammp.addIntArg(lammpId);
-    for (int i = 0; i<length; i++) {
-        msgLammp.addIntArg(rgbs[i]);
+    for (int i = 0; i<12; i++) {
+        msgLammp.addIntArg(rgbs[i]*255);
     }
     
     return msgLammp;
