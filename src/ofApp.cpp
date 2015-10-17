@@ -630,10 +630,16 @@ void ofApp::update(){
 
 void ofApp::resetLights(){
     
-    setLightPositionAndMovementForMarkerId(lights[0], markerIds[4], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[1], markerIds[2], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[2], markerIds[7], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
-    setLightPositionAndMovementForMarkerId(lights[3], markerIds[9], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[0], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[1], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[2], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+//    setLightPositionAndMovementForMarkerId(lights[3], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+    
+    for (int i = 0; i<4; i++) {
+        mutLight *light = lights[i];
+        setLightPositionAndMovementForMarkerId(light, markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
+        light->setDiffuseColor(ofColor(ofRandom(255.0f), ofRandom(255.0f), ofRandom(255.0f)));
+    }
     
     animationState = 0;
 }
