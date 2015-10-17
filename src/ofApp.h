@@ -158,4 +158,7 @@ public:
     bool drawLights = true;
     
     bool isMoving = false;
+    
+    // LAMMPS
+    vector<lammpsLight*> lammps;
 };

@@ -257,6 +257,11 @@ void ofApp::setup(){
     
     roomLength = ofDist(f0.getPosition().x, f0.getPosition().y, f9.getPosition().x, f9.getPosition().y);
     
+    lammps.push_back(new lammpsLight());
+    lammps.push_back(new lammpsLight());
+    lammps.push_back(new lammpsLight());
+    lammps.push_back(new lammpsLight());
+    
     resetLights();
     
 }
@@ -265,6 +270,12 @@ void ofApp::setup(){
 #pragma mark - Moving Lights
 
 void ofApp::update(){
+    ofxOscBundle bundle;
+    for (int i = 0; i<lammps.size(); i++) {
+        lammps[i]->update();
+        bundle.addMessage(lammps[i]->getOscMessage());
+    }
+    oscSenderToLammp->sendBundle(bundle);
     
     if (tcpClient.isConnected())
     {
@@ -639,7 +650,7 @@ void ofApp::resetLights(){
 //    setLightPositionAndMovementForMarkerId(lights[3], markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
     
     
-    ofxOscBundle bundle;
+//    ofxOscBundle bundle;
     for (int i = 0; i<4; i++) {
         mutLight *l = lights[i];
         setLightPositionAndMovementForMarkerId(l, markerIds[(int)ofRandom(9.0)], ofVec2f(0.5f, 0.5f), LIGHT_MOVEMENT_SOMEWHERE);
@@ -656,14 +667,14 @@ void ofApp::resetLights(){
         //
         //                    ofxOscMessage msgLammp = setLammpWithRGBs(l->getMutLightId(), rgbs);
         
-        lammpsLight *light = new lammpsLight();
-        light->setLammpsLightId(i);
-        light->setColor(ofVec3f(r,g,b));
-        bundle.addMessage(light->getOscMessage());
+//        lammpsLight *light = new lammpsLight();
+        lammps[i]->setLammpsLightId(i);
+        lammps[i]->setColor(ofVec3f(r,g,b));
+//        bundle.addMessage(light->getOscMessage());
         
         // ----------------------------------------------------------------------------------------------
     }
-    oscSenderToLammp-> sendBundle(bundle);
+//    oscSenderToLammp-> sendBundle(bundle);
     
     animationState = 0;
     
