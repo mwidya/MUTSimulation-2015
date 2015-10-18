@@ -1,10 +1,10 @@
 #include "ofApp.h"
 #include "Constants.h"
 
-#define TCP_NODEJS_IS_LOCAL true
-#define OSC_CLIENTS_IS_LOCAL true
+#define TCP_NODEJS_IS_LOCAL false
+#define OSC_CLIENTS_IS_LOCAL false
 #define OSC_AUDIO_IS_LOCAL true
-#define OSC_LAMMPS_IS_LOCAL true
+#define OSC_LAMMPS_IS_LOCAL false
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 //#define MIDI_DEVICE_NAME "MIDISPORT 4x4 Port A"
 
@@ -251,7 +251,7 @@ void ofApp::setup(){
     sendPlanePositions();
     
 //    drawMarker(markerOn);
-    drawMarker(false);
+    drawMarker(true);
     
     easyCam.setDistance(30000*factor);
     
@@ -264,6 +264,11 @@ void ofApp::setup(){
     
     resetLights();
     
+//    lammpsEvent event;
+//    event.duration = 10000;
+//    event.state = ST_FLOAT;
+//    lammps[0]->addEvent(event);
+    
 }
 
 // -------------------------------------------------- Moving Lights -------------------------------------------------------
@@ -273,7 +278,10 @@ void ofApp::update(){
     ofxOscBundle bundle;
     for (int i = 0; i<lammps.size(); i++) {
         lammps[i]->update();
-        bundle.addMessage(lammps[i]->getOscMessage());
+        if(lammp_toggle)
+            bundle.addMessage(lammps[i]->getOscMessage());
+        else
+            bundle.addMessage(lammps[i]->getZeros());
     }
     oscSenderToLammp->sendBundle(bundle);
     
@@ -366,6 +374,11 @@ void ofApp::update(){
                     float orientationZ = ofLerp(l->getStartOrientation().z, l->getTargetOrientation().z, amnt);
                     lerpOrientation = ofVec3f(orientationX, orientationY, orientationZ);
                     l->setOrientation(lerpOrientation);
+                    
+                    lammpsLight *lammp_ = lammps[l->getMutLightId()];
+                    ofVec3f color = lammp_->getColor();
+                    color = color*(1.0f-amnt);
+                    lammp_->setInternalColor(color);
                 }
                 
                 else if (l->getMovement() == LIGHT_MOVEMENT_SOMEWHERE){
@@ -391,6 +404,19 @@ void ofApp::update(){
                     
                     if (l->getMutLightId() == 0) {
                         
+//                        ofVec3f vec;
+//                        vec.x = l->getPosition().x - cos(ofGetElapsedTimef())*100;
+//                        vec.y = l->getPosition().y;
+//                        vec.z = l->getPosition().z;
+//                        l->setPosition(vec);
+                        
+                        if (animationState == 0) {
+                            ofVec3f vec;
+                            vec.x = l->getPosition().x-5;
+                            vec.y = l->getPosition().y-5;
+                            vec.z = l->getPosition().z-5;
+                            l->setPosition(vec);
+                        }
                         if (animationState == 1) {
                             ofVec3f ori;
                             ori.x = l->getOrientationEuler().x;
@@ -441,7 +467,9 @@ void ofApp::update(){
                             setLightOri(l, ori);
                         }
                         
-                        cout << "l->getOrientationEuler().z = " << l->getOrientationEuler().z * 10000000 << endl;
+                        
+                    
+                        
                         
                     }
                     else if (l->getMutLightId() == 1) {
@@ -608,6 +636,20 @@ void ofApp::update(){
                         }
                     }
                     
+                    float factor = abs(cos(l->getPosition().x/4000));
+                    
+                    lammpsLight *lammp_ = lammps[l->getMutLightId()];
+                    ofVec3f color = lammp_->getColor();
+                    color.x = color.x * factor;// * factor;
+                    color.y = color.y * factor;// * factor;
+                    color.z = color.z * factor;// * factor;
+                    cout << "factor = " << factor << endl;
+                    cout << "color.x = " << color.x << endl;
+                    cout << "color.y = " << color.y << endl;
+                    cout << "color.z = " << color.z << endl;
+                    lammp_->setInternalColor(color);
+                    
+                    
                     animationDeltaTime = ofGetElapsedTimeMillis() - animationSwitchStateTime;
                     if (animationDeltaTime>5000) {
                         animationState++;
@@ -669,6 +711,7 @@ void ofApp::resetLights(){
         
 //        lammpsLight *light = new lammpsLight();
         lammps[i]->setLammpsLightId(i);
+        lammps[i]->setInternalColor(ofVec3f(r,g,b));
         lammps[i]->setColor(ofVec3f(r,g,b));
 //        bundle.addMessage(light->getOscMessage());
         
@@ -1246,6 +1289,10 @@ void ofApp::keyPressed(int key){
     
     if (key=='r') {
         resetLights();
+    }
+    
+    if (key=='q') {
+        lammp_toggle = !lammp_toggle;
     }
     
     if (key == 'n') {

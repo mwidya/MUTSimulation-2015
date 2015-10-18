@@ -19,9 +19,15 @@ lammpsEvent lammpsLight::getCurrentEvent(){
 void lammpsLight::setColor(ofVec3f RGB){
 	for (int i = 0; i < numLEDs; i++){
 		rgbO[i] = RGB;
-		rgb[i] = RGB;
 	}
 }
+
+void lammpsLight::setInternalColor(ofVec3f RGB){
+    for (int i = 0; i < numLEDs; i++){
+        rgb[i] = RGB;
+    }
+}
+
 ofVec3f lammpsLight::getColor(){
 	return rgbO[0];
 }
@@ -96,4 +102,17 @@ ofxOscMessage lammpsLight::getOscMessage(){
 	}
 
 	return msgLammp;
+}
+
+ofxOscMessage lammpsLight::getZeros(){
+    ofxOscMessage msgLammp;
+    msgLammp.setAddress("/LAMMPS");
+    msgLammp.addIntArg(lammpsLightID);
+    for (int i = 0; i<numLEDs; i++) {
+        msgLammp.addIntArg(0.0f);
+        msgLammp.addIntArg(0.0f);
+        msgLammp.addIntArg(0.0f);
+    }
+    
+    return msgLammp;
 }

@@ -33,6 +33,7 @@ public:
 	lammpsEvent getCurrentEvent();
 	void setState(lammpsState state);
 	void setColor(ofVec3f rgb);
+    void setInternalColor(ofVec3f RGB);
 	ofVec3f getColor();
 	ofVec3f getInternalColor();
    
@@ -41,6 +42,7 @@ public:
 	void addEvent(lammpsEvent lEvent);
     
 	ofxOscMessage getOscMessage();
+    ofxOscMessage getZeros();
 
 private:
     int lammpsLightID;

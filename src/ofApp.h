@@ -161,4 +161,5 @@ public:
     
     // LAMMPS
     vector<lammpsLight*> lammps;
+    bool lammp_toggle;
 };
