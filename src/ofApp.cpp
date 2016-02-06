@@ -1,10 +1,10 @@
 #include "ofApp.h"
 #include "Constants.h"
 
-#define TCP_NODEJS_IS_LOCAL false
-#define OSC_CLIENTS_IS_LOCAL false
+#define TCP_NODEJS_IS_LOCAL true
+#define OSC_CLIENTS_IS_LOCAL true
 #define OSC_AUDIO_IS_LOCAL true
-#define OSC_LAMMPS_IS_LOCAL false
+#define OSC_LAMMPS_IS_LOCAL true
 #define MIDI_DEVICE_NAME "IAC-Treiber IAC-Bus 1"
 //#define MIDI_DEVICE_NAME "MIDISPORT 4x4 Port A"
 
